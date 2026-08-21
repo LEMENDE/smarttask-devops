@@ -34,6 +34,14 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy Dev Environment') {
+            steps {
+                sh "docker compose down || true"
+                sh "docker compose pull || true"
+                sh "docker compose up -d"
+            }
+        }
     }
 
     post {
@@ -41,7 +49,7 @@ pipeline {
             echo "Le Pipeline CI/CD a échoué."
         }
         success {
-            echo "Images construites et poussées sur Docker Hub avec succès."
+            echo "Images construites, poussées et déployées avec succès !"
         }
     }
 }
