@@ -37,9 +37,10 @@ pipeline {
 
         stage('Deploy Dev Environment') {
             steps {
-                sh "docker compose down || true"
-                sh "docker compose pull || true"
-                sh "docker compose up -d"
+                sh "docker stop smarttask-frontend smarttask-backend || true"
+                sh "docker rm smarttask-frontend smarttask-backend || true"
+                sh "docker run -d --name smarttask-backend -p 5000:5000 lemende/smarttask-backend:latest"
+                sh "docker run -d --name smarttask-frontend -p 80:80 lemende/smarttask-frontend:latest"
             }
         }
     }
