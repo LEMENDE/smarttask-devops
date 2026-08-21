@@ -35,7 +35,7 @@ pipeline {
             }
         }
 
-        stage('Deploy Environment') {
+        stage('Deploy Prod Environment') {
             steps {
                 sh "docker-compose down || true"
                 sh "docker-compose pull || true"
