@@ -1,11 +1,16 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'docker:cli'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
 
     environment {
         DOCKER_HUB_USER = 'arnolde'
-        FRONTEND_IMAGE = "${DOCKER_HUB_USER}/smarttask-frontend"
-        BACKEND_IMAGE  = "${DOCKER_HUB_USER}/smarttask-backend"
-        TAG            = "${BUILD_NUMBER}"
+        FRONTEND_IMAGE  = "${DOCKER_HUB_USER}/smarttask-frontend"
+        BACKEND_IMAGE   = "${DOCKER_HUB_USER}/smarttask-backend"
+        TAG             = "${BUILD_NUMBER}"
     }
 
     stages {
@@ -17,22 +22,19 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                script {
-                    dockerFrontend = docker.build("${FRONTEND_IMAGE}:${TAG}", "./frontend")
-                    dockerBackend  = docker.build("${BACKEND_IMAGE}:${TAG}", "./backend")
-                }
+                sh "docker build -t ${FRONTEND_IMAGE}:${TAG} -t ${FRONTEND_IMAGE}:latest ./frontend"
+                sh "docker build -t ${BACKEND_IMAGE}:${TAG} -t ${BACKEND_IMAGE}:latest ./backend"
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials-id') {
-                        dockerFrontend.push("${TAG}")
-                        dockerFrontend.push("latest")
-                        dockerBackend.push("${TAG}")
-                        dockerBackend.push("latest")
-                    }
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    sh "echo \$PASS | docker login -u \$USER --password-stdin"
+                    sh "docker push ${FRONTEND_IMAGE}:${TAG}"
+                    sh "docker push ${FRONTEND_IMAGE}:latest"
+                    sh "docker push ${BACKEND_IMAGE}:${TAG}"
+                    sh "docker push ${BACKEND_IMAGE}:latest"
                 }
             }
         }
