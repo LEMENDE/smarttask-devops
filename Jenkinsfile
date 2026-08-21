@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         PATH = "/usr/bin:/usr/local/bin:${env.PATH}"
-        DOCKER_HUB_USER = 'arnolde'
+        DOCKER_HUB_USER = 'lemende'
         FRONTEND_IMAGE  = "${DOCKER_HUB_USER}/smarttask-frontend"
         BACKEND_IMAGE   = "${DOCKER_HUB_USER}/smarttask-backend"
         TAG             = "${BUILD_NUMBER}"
