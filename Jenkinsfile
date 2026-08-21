@@ -1,12 +1,8 @@
 pipeline {
-    agent {
-        docker {
-            image 'docker:cli'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
 
     environment {
+        PATH = "/usr/bin:/usr/local/bin:${env.PATH}"
         DOCKER_HUB_USER = 'arnolde'
         FRONTEND_IMAGE  = "${DOCKER_HUB_USER}/smarttask-frontend"
         BACKEND_IMAGE   = "${DOCKER_HUB_USER}/smarttask-backend"
